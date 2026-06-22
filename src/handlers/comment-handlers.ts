@@ -1,5 +1,5 @@
 import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
-import { ghAsync, writeToTempFile, removeTempFile } from '../utils/exec.js';
+import { ghAsync, tempMarkdownFileName, writeToTempFile, removeTempFile } from '../utils/exec.js';
 import { ToolResponse } from '../types.js';
 
 function validateRepo(repo: string): void {
@@ -25,20 +25,21 @@ function validateIssueNumber(issueNumber: string): void {
  */
 export async function handleAddComment(args: {
   repo: string;
-  issue_number: string;
+  issue_number: string | number;
   body: string;
   state?: 'open' | 'closed';
 }): Promise<ToolResponse> {
-  const tempFile = 'comment_body.md';
+  const tempFile = tempMarkdownFileName('comment-body');
+  const issueNumber = String(args.issue_number);
   validateRepo(args.repo);
-  validateIssueNumber(args.issue_number);
+  validateIssueNumber(issueNumber);
 
   try {
     // ステータスの変更が指定されている場合は先に処理
     if (args.state) {
       try {
         const command = args.state === 'closed' ? 'close' : 'reopen';
-        await ghAsync(['issue', command, args.issue_number, '--repo', args.repo]);
+        await ghAsync(['issue', command, issueNumber, '--repo', args.repo]);
         console.log(`Issue status changed to ${args.state}`);
       } catch (error) {
         console.error('Failed to change issue status:', error);
@@ -55,7 +56,7 @@ export async function handleAddComment(args: {
       await ghAsync([
         'issue',
         'comment',
-        args.issue_number,
+        issueNumber,
         '--repo',
         args.repo,
         '--body-file',
@@ -74,7 +75,7 @@ export async function handleAddComment(args: {
       const { stdout: issueData } = await ghAsync([
         'issue',
         'view',
-        args.issue_number,
+        issueNumber,
         '--repo',
         args.repo,
         '--json',

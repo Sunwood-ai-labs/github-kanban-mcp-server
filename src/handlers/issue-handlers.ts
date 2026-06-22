@@ -1,6 +1,6 @@
 import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 import { IssueArgs, CreateIssueArgs, UpdateIssueArgs, ToolResponse } from '../types.js';
-import { ghAsync, writeToTempFile, removeTempFile } from '../utils/exec.js';
+import { ghAsync, tempMarkdownFileName, writeToTempFile, removeTempFile } from '../utils/exec.js';
 import { getExistingLabels, createLabel } from './label-handlers.js';
 import { getRepoInfoFromGitConfig } from '../utils/repo-info.js';
 
@@ -71,7 +71,7 @@ export async function handleListIssues(args: IssueArgs): Promise<ToolResponse> {
  */
 export async function handleCreateIssue(args: CreateIssueArgs): Promise<ToolResponse> {
   const { owner, repo } = await getRepoInfo(args);
-  const tempFile = 'issue_body.md';
+  const tempFile = tempMarkdownFileName('issue-body');
 
   try {
     // ラベルの存在確認と作成
@@ -146,7 +146,7 @@ export async function handleUpdateIssue(args: UpdateIssueArgs): Promise<ToolResp
   const { owner, repo } = await getRepoInfo(args);
   const issueNumber = issueNumberArg(args.issue_number);
 
-  const tempFile = 'update_body.md';
+  const tempFile = tempMarkdownFileName('update-body');
 
   try {
     // 状態の更新を処理

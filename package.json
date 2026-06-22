@@ -1,6 +1,6 @@
 {
   "name": "@sunwood-ai-labs/github-kanban-mcp-server",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "A Model Context Protocol server for managing GitHub issues as Kanban using gh CLI",
   "main": "build/index.js",
   "type": "module",
