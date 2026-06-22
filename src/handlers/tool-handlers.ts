@@ -80,6 +80,7 @@ export async function handleToolRequest(request: CallToolRequest): Promise<ToolR
           repo: fullRepo,
           issue_number: args.issue_number as string,
           body: args.body as string,
+          state: args?.state as 'open' | 'closed' | undefined,
         });
       }
       default:
