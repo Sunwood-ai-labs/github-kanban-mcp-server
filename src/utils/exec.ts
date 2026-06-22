@@ -1,9 +1,13 @@
-import { exec } from 'child_process';
+import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { join } from 'path';
 import fs from 'fs/promises';
 
-export const execAsync = promisify(exec);
+export const execFileAsync = promisify(execFile);
+
+export async function ghAsync(args: string[]): Promise<{ stdout: string; stderr: string }> {
+  return await execFileAsync('gh', args);
+}
 
 /**
  * 一時ファイルにMarkdownコンテンツを書き込む

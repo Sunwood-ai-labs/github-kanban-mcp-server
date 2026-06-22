@@ -1,5 +1,5 @@
 import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
-import { execAsync } from '../utils/exec.js';
+import { ghAsync } from '../utils/exec.js';
 import { getRepoInfoFromGitConfig } from '../utils/repo-info.js';
 
 /**
@@ -20,9 +20,16 @@ export function generateRandomColor(): string {
 export async function getExistingLabels(path: string): Promise<string[]> {
   try {
     const { owner, repo } = await getRepoInfoFromGitConfig(path);
-    const { stdout } = await execAsync(
-      `gh label list --repo ${owner}/${repo} --json name --jq '.[].name'`
-    );
+    const { stdout } = await ghAsync([
+      'label',
+      'list',
+      '--repo',
+      `${owner}/${repo}`,
+      '--json',
+      'name',
+      '--jq',
+      '.[].name',
+    ]);
     return stdout.trim().split('\n').filter(Boolean);
   } catch (error) {
     console.error('Failed to get labels:', error);
@@ -37,9 +44,16 @@ export async function createLabel(path: string, name: string): Promise<void> {
   const color = generateRandomColor().substring(1); // '#'を除去
   const { owner, repo } = await getRepoInfoFromGitConfig(path);
   try {
-    await execAsync(
-      `gh label create "${name}" --repo ${owner}/${repo} --color "${color}" --force`
-    );
+    await ghAsync([
+      'label',
+      'create',
+      name,
+      '--repo',
+      `${owner}/${repo}`,
+      '--color',
+      color,
+      '--force',
+    ]);
   } catch (error) {
     console.error(`Failed to create label ${name}:`, error);
     throw new McpError(
