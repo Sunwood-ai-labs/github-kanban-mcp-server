@@ -1,4 +1,5 @@
 import { execFile } from 'child_process';
+import { randomUUID } from 'crypto';
 import { promisify } from 'util';
 import { join } from 'path';
 import fs from 'fs/promises';
@@ -7,6 +8,10 @@ export const execFileAsync = promisify(execFile);
 
 export async function ghAsync(args: string[]): Promise<{ stdout: string; stderr: string }> {
   return await execFileAsync('gh', args);
+}
+
+export function tempMarkdownFileName(prefix: string): string {
+  return `${prefix}-${randomUUID()}.md`;
 }
 
 /**
